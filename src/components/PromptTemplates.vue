@@ -1,52 +1,58 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">提示词模板库</h2>
-      <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm font-medium">
+  <div class="space-y-4 sm:space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">📚</span>
+        <h2 class="text-lg sm:text-xl font-medium text-[#37352f]">提示词模板库</h2>
+      </div>
+      
+      <button class="px-3 sm:px-4 py-2 bg-[#2383e2] hover:bg-[#1a6fc2] active:bg-[#155a9e] rounded text-sm font-medium text-white transition-colors w-fit">
         + 添加模板
       </button>
     </div>
 
     <!-- Filter Tags -->
-    <div class="flex gap-2 flex-wrap">
+    <div class="flex gap-1.5 sm:gap-2 flex-wrap">
       <button 
         v-for="tag in tags" 
         :key="tag"
         @click="selectedTag = tag"
-        :class="['px-3 py-1 rounded-full text-sm transition-all', selectedTag === tag ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700']"
+        :class="['px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm transition-colors', selectedTag === tag ? 'bg-[#37352f] text-white' : 'bg-[#f7f6f3] text-[#6b6b6b] hover:bg-[#e3e2e0]']"
       >
         {{ tag }}
       </button>
     </div>
 
     <!-- Template Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
       <div 
         v-for="template in filteredTemplates" 
         :key="template.id"
-        class="lab-card p-5 cursor-pointer hover:border-blue-500 transition-all"
+        class="lab-card p-4 sm:p-5 cursor-pointer hover:bg-[#f1f1ef] transition-colors active:bg-[#e3e2e0]"
         @click="useTemplate(template)"
       >
-        <div class="flex items-start justify-between mb-3">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">{{ template.icon }}</span>
-            <div>
-              <h3 class="font-semibold">{{ template.name }}</h3>
-              <p class="text-sm text-slate-400">{{ template.category }}</p>
+        <div class="flex items-start justify-between mb-2 sm:mb-3">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <span class="text-xl sm:text-2xl">{{ template.icon }}</span>
+            <div class="min-w-0">
+              <h3 class="font-medium text-[#37352f] text-sm sm:text-base truncate">{{ template.name }}</h3>
+              <p class="text-xs text-[#6b6b6b]">{{ template.category }}</p>
             </div>
           </div>
-          <span class="px-2 py-1 bg-slate-800 rounded text-xs text-slate-400">
+          
+          <span class="px-2 py-0.5 bg-[#f7f6f3] rounded text-xs text-[#6b6b6b] shrink-0">
             {{ template.phases }} 阶段
           </span>
         </div>
         
-        <p class="text-sm text-slate-400 mb-4 line-clamp-2">{{ template.description }}</p>
+        <p class="text-xs sm:text-sm text-[#6b6b6b] mb-3 line-clamp-2">{{ template.description }}</p>
         
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-1.5">
           <span 
             v-for="tag in template.tags" 
             :key="tag"
-            class="px-2 py-1 bg-slate-800 rounded text-xs text-slate-500"
+            class="px-1.5 py-0.5 bg-[#f7f6f3] rounded text-xs text-[#9ca3af]"
           >
             {{ tag }}
           </span>
@@ -55,24 +61,31 @@
     </div>
 
     <!-- Featured Template: Laboratory Pattern -->
-    <div class="lab-card p-6 border-blue-500/50">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-3xl">🧪</span>
+    <div class="lab-card p-4 sm:p-6 border-[#2383e2]/30 bg-[#2383e2]/5">
+      <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+        <span class="text-2xl sm:text-3xl">🧪</span>
         <div>
-          <h3 class="text-lg font-semibold">实验室模式（Brian Lovin 推荐）</h3>
-          <p class="text-sm text-blue-400">给 Agent 一个反馈循环</p>
+          <h3 class="text-base sm:text-lg font-medium text-[#37352f]">实验室模式</h3>
+          <p class="text-xs sm:text-sm text-[#2383e2]">Brian Lovin 推荐 · 给 Agent 一个反馈循环</p>
         </div>
       </div>
 
-      <div class="bg-slate-950 p-4 rounded-lg font-mono text-sm whitespace-pre-wrap mb-4">
+      <div class="bg-[#f7f6f3] p-3 sm:p-4 rounded font-mono text-xs sm:text-sm whitespace-pre-wrap mb-3 sm:mb-4 text-[#37352f] overflow-x-auto border border-[#e3e2e0]">
 {{ laboratoryTemplate }}
       </div>
 
-      <div class="flex gap-3">
-        <button @click="copyTemplate(laboratoryTemplate)" class="flex-1 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm font-medium">
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <button 
+          @click="copyTemplate(laboratoryTemplate)" 
+          class="flex-1 py-2 sm:py-2.5 bg-[#2383e2] hover:bg-[#1a6fc2] active:bg-[#155a9e] rounded text-sm font-medium text-white transition-colors"
+        >
           复制模板
         </button>
-        <button @click="useInLab" class="flex-1 py-2 border border-blue-500 text-blue-400 hover:bg-blue-500/10 rounded-lg text-sm font-medium">
+        
+        <button 
+          @click="useInLab" 
+          class="flex-1 py-2 sm:py-2.5 border border-[#2383e2] text-[#2383e2] hover:bg-[#2383e2]/10 active:bg-[#2383e2]/20 rounded text-sm font-medium transition-colors"
+        >
           在实验室中使用
         </button>
       </div>

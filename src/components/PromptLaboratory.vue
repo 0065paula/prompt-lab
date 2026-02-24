@@ -1,125 +1,148 @@
 <template>
-  <div class="grid grid-cols-2 gap-6">
-    <!-- Left: Input & Control -->
-    <div class="space-y-6">
-      <!-- Original Prompt -->
-      <div class="lab-card p-6">
-        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-          <span>📝</span>
-          原始提示词
-        </h3>
-        <textarea 
-          v-model="originalPrompt"
-          class="w-full h-40 bg-slate-950 border border-slate-700 rounded-lg p-4 text-sm resize-none focus:border-blue-500 focus:outline-none"
-          placeholder="输入你的原始提示词..."
-        />
-      </div>
-
-      <!-- Optimization Target -->
-      <div class="lab-card p-6">
-        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-          <span>🎯</span>
-          优化目标
-        </h3>
-        <div class="space-y-3">
-          <label v-for="target in targets" :key="target.id" class="flex items-center gap-3 p-3 rounded-lg bg-slate-950 cursor-pointer hover:bg-slate-900">
-            <input 
-              type="checkbox" 
-              v-model="selectedTargets" 
-              :value="target.id"
-              class="w-5 h-5 rounded border-slate-600 text-blue-500 focus:ring-blue-500"
-            />
-            <span class="text-2xl">{{ target.icon }}</span>
-            <div>
-              <p class="font-medium">{{ target.name }}</p>
-              <p class="text-sm text-slate-400">{{ target.description }}</p>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex gap-3">
-        <button 
-          @click="startOptimization"
-          :disabled="!canStart"
-          :class="['flex-1 py-3 px-4 rounded-lg font-semibold transition-all', canStart ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-slate-700 text-slate-400 cursor-not-allowed']"
-        >
-          {{ isOptimizing ? '优化中...' : '开始优化' }}
-        </button>
-        
-        <button 
-          @click="$emit('reset')"
-          class="px-4 py-3 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800"
-        >
-          重置
-        </button>
-      </div>
-    </div>
-
-    <!-- Right: Results & Analysis -->
-    <div class="space-y-6">
-      <!-- Phase 1: Instrumentation -->
-      <div v-if="currentPhase >= 0" class="lab-card p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold flex items-center gap-2">
-            <span :class="['w-8 h-8 rounded-full flex items-center justify-center text-sm', phase1Completed ? 'bg-green-500' : 'bg-blue-500']">
-              {{ phase1Completed ? '✓' : '1' }}
-            </span>
-            基线分析
+  <div class="space-y-4 sm:space-y-6">
+    <!-- Mobile: Single Column / Desktop: Two Columns -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <!-- Left: Input & Control -->
+      <div class="space-y-4 sm:space-y-6">
+        <!-- Original Prompt -->
+        <div class="lab-card p-4 sm:p-6">
+          <h3 class="text-base sm:text-lg font-medium mb-3 sm:mb-4 flex items-center gap-2 text-[#37352f]">
+            <span>📝</span>
+            原始提示词
           </h3>
-          <button v-if="!phase1Completed" @click="runInstrumentation" class="text-sm text-blue-400 hover:text-blue-300">
-            运行分析
+          <textarea 
+            v-model="originalPrompt"
+            class="w-full h-32 sm:h-40 bg-[#f7f6f3] border border-[#e3e2e0] rounded p-3 sm:p-4 text-sm resize-none focus:border-[#2383e2] focus:outline-none transition-colors"
+            placeholder="输入你的原始提示词..."
+          />
+        </div>
+
+        <!-- Optimization Target -->
+        <div class="lab-card p-4 sm:p-6">
+          <h3 class="text-base sm:text-lg font-medium mb-3 sm:mb-4 flex items-center gap-2 text-[#37352f]">
+            <span>🎯</span>
+            优化目标
+          </h3>
+          <div class="space-y-2">
+            <label 
+              v-for="target in targets" 
+              :key="target.id" 
+              class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded cursor-pointer hover:bg-[#f1f1ef] transition-colors active:bg-[#e3e2e0]"
+            >
+              <input 
+                type="checkbox" 
+                v-model="selectedTargets" 
+                :value="target.id"
+                class="w-4 h-4 sm:w-5 sm:h-5 rounded border-[#e3e2e0] text-[#2383e2] focus:ring-[#2383e2]"
+              />
+              <span class="text-xl">{{ target.icon }}</span>
+              <div class="min-w-0">
+                <p class="font-medium text-sm text-[#37352f]">{{ target.name }}</p>
+                <p class="text-xs text-[#6b6b6b] truncate">{{ target.description }}</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-2 sm:gap-3">
+          <button 
+            @click="startOptimization"
+            :disabled="!canStart"
+            :class="['flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded font-medium transition-colors text-sm sm:text-base', canStart ? 'bg-[#2383e2] hover:bg-[#1a6fc2] text-white active:bg-[#155a9e]' : 'bg-[#e3e2e0] text-[#6b6b6b] cursor-not-allowed']"
+          >
+            {{ isOptimizing ? '优化中...' : '开始优化' }}
+          </button>
+          
+          <button 
+            @click="$emit('reset')"
+            class="px-3 sm:px-4 py-2.5 sm:py-3 rounded border border-[#e3e2e0] text-[#6b6b6b] hover:bg-[#f7f6f3] active:bg-[#e3e2e0] text-sm sm:text-base"
+          >
+            重置
           </button>
         </div>
-        
-        <div v-if="instrumentationResults" class="space-y-3">
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-slate-950 p-3 rounded-lg text-center">
-              <p class="text-2xl font-bold text-blue-400">{{ instrumentationResults.wordCount }}</p>
-              <p class="text-xs text-slate-400">词数</p>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-lg text-center">
-              <p class="text-2xl font-bold text-yellow-400">{{ instrumentationResults.clarityScore }}</p>
-              <p class="text-xs text-slate-400">清晰度 (1-10)</p>
-            </div>
-            <div class="bg-slate-950 p-3 rounded-lg text-center">
-              <p class="text-2xl font-bold text-green-400">{{ instrumentationResults.structureScore }}</p>
-              <p class="text-xs text-slate-400">结构化 (1-10)</p>
-            </div>
+      </div>
+
+      <!-- Right: Results & Analysis -->
+      <div class="space-y-4 sm:space-y-6">
+        <!-- Phase 1: Instrumentation -->
+        <div v-if="currentPhase >= 0" class="lab-card p-4 sm:p-6">
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 class="text-base sm:text-lg font-medium flex items-center gap-2 text-[#37352f]">
+              <span :class="['w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs text-white', phase1Completed ? 'bg-[#0f7b6f]' : 'bg-[#2383e2]']">
+                {{ phase1Completed ? '✓' : '1' }}
+              </span>
+              基线分析
+            </h3>
+            <button 
+              v-if="!phase1Completed" 
+              @click="runInstrumentation" 
+              class="text-xs sm:text-sm text-[#2383e2] hover:text-[#1a6fc2] font-medium"
+            >
+              运行分析
+            </button>
           </div>
           
-          <div class="bg-slate-950 p-3 rounded-lg">
-            <p class="text-sm font-medium mb-2">检测到的问题:</p>
-            <ul class="text-sm text-slate-400 space-y-1">
-              <li v-for="issue in instrumentationResults.issues" :key="issue">• {{ issue }}</li>
-            </ul>
+          <div v-if="instrumentationResults" class="space-y-3">
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
+              <div class="bg-[#f7f6f3] p-2 sm:p-3 rounded text-center">
+                <p class="text-xl sm:text-2xl font-semibold text-[#2383e2]">{{ instrumentationResults.wordCount }}</p>
+                <p class="text-xs text-[#6b6b6b]">词数</p>
+              </div>
+              <div class="bg-[#f7f6f3] p-2 sm:p-3 rounded text-center">
+                <p class="text-xl sm:text-2xl font-semibold text-[#dfab01]">{{ instrumentationResults.clarityScore }}</p>
+                <p class="text-xs text-[#6b6b6b]">清晰度</p>
+              </div>
+              <div class="bg-[#f7f6f3] p-2 sm:p-3 rounded text-center">
+                <p class="text-xl sm:text-2xl font-semibold text-[#0f7b6f]">{{ instrumentationResults.structureScore }}</p>
+                <p class="text-xs text-[#6b6b6b]">结构化</p>
+              </div>
+            </div>
+            
+            <div class="bg-[#f7f6f3] p-3 rounded">
+              <p class="text-sm font-medium mb-2 text-[#37352f]">检测到的问题:</p>
+              <ul class="text-sm text-[#6b6b6b] space-y-1">
+                <li v-for="issue in instrumentationResults.issues" :key="issue" class="flex items-start gap-1.5">
+                  <span class="text-[#e03e3e]">•</span>
+                  <span>{{ issue }}</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Phase 2-4: Optimization Preview -->
-      <div v-if="optimizedPrompt" class="lab-card p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold flex items-center gap-2">
-            <span class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-sm">✓</span>
-            优化后提示词
-          </h3>
-          <button @click="copyOptimized" class="text-sm text-blue-400 hover:text-blue-300">
-            复制
-          </button>
-        </div>
-        
-        <div class="bg-slate-950 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap">
-          {{ optimizedPrompt }}
-        </div>
-        
-        <!-- Diff View -->
-        <div class="mt-4">
-          <p class="text-sm font-medium mb-2">变更对比:</p>
-          <div class="bg-slate-950 p-3 rounded-lg text-sm space-y-2">
-            <div v-for="(change, index) in changes" :key="index" :class="['p-2 rounded', change.type === 'added' ? 'diff-added' : 'diff-removed']">
-              <span class="font-mono">{{ change.type === 'added' ? '+' : '-' }} {{ change.text }}</span>
+        <!-- Phase 2-4: Optimization Preview -->
+        <div v-if="optimizedPrompt" class="lab-card p-4 sm:p-6">
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 class="text-base sm:text-lg font-medium flex items-center gap-2 text-[#37352f]">
+              <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#0f7b6f] flex items-center justify-center text-xs text-white">✓</span>
+              优化后提示词
+            </h3>
+            <button 
+              @click="copyOptimized" 
+              class="text-xs sm:text-sm text-[#2383e2] hover:text-[#1a6fc2] font-medium"
+            >
+              复制
+            </button>
+          </div>
+          
+          <div class="bg-[#f7f6f3] p-3 sm:p-4 rounded text-sm font-mono whitespace-pre-wrap text-[#37352f] border border-[#e3e2e0] max-h-48 sm:max-h-64 overflow-y-auto">
+            {{ optimizedPrompt }}
+          </div>
+          
+          <!-- Diff View -->
+          <div v-if="changes.length > 0" class="mt-4">
+            <p class="text-sm font-medium mb-2 text-[#37352f]">变更对比:</p>
+            <div class="space-y-1.5">
+              <div 
+                v-for="(change, index) in changes" 
+                :key="index" 
+                class="p-2 sm:p-2.5 rounded text-sm flex items-start gap-2"
+                :class="change.type === 'added' ? 'bg-[#0f7b6f]/10 text-[#0f7b6f]' : 'bg-[#e03e3e]/10 text-[#e03e3e]'"
+              >
+                <span class="font-mono font-medium">{{ change.type === 'added' ? '+' : '-' }}</span>
+                <span>{{ change.text }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -157,7 +180,6 @@ const canStart = computed(() =>
 )
 
 function runInstrumentation() {
-  // Analyze the original prompt
   const words = originalPrompt.value.split(/\s+/)
   const sentences = originalPrompt.value.split(/[.!?。！？]+/)
   
@@ -173,7 +195,7 @@ function runInstrumentation() {
   
   instrumentationResults.value = {
     wordCount: words.length,
-    clarityScore: Math.max(3, 10 - issues.length * 1.5),
+    clarityScore: Math.max(3, Math.round(10 - issues.length * 1.5)),
     structureScore: sentences.length > 3 ? 7 : 4,
     issues: issues.length > 0 ? issues : ['提示词结构良好']
   }
@@ -185,13 +207,11 @@ function runInstrumentation() {
 async function startOptimization() {
   isOptimizing.value = true
   
-  // Phase 1
   if (!phase1Completed.value) {
     runInstrumentation()
     await sleep(500)
   }
   
-  // Generate optimized prompt based on selected targets
   let optimized = originalPrompt.value
   const newChanges = []
   
