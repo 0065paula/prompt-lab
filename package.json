@@ -1,0 +1,27 @@
+{
+  "name": "prompt-lab",
+  "version": "1.0.0",
+  "description": "前端提示词优化实验室 - 可视化对比与迭代工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.0",
+    "pinia": "^2.1.0",
+    "html2canvas": "^1.4.1",
+    "pixelmatch": "^5.3.0",
+    "highlight.js": "^11.9.0",
+    "marked": "^12.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0"
+  }
+}
