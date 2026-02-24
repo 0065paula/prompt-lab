@@ -95,8 +95,12 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useToast } from '../composables/useToast'
 
-const tags = ['全部', '性能优化', 'UI实现', '代码重构', 'Bug修复', '架构设计']
+const toast = useToast()
+const emit = defineEmits(['use-template'])
+
+const tags = ['全部', '性能优化', 'UI实现', '代码重构', 'Bug修复', '架构设计', '组件', '后端']
 const selectedTag = ref('全部')
 
 const templates = [
@@ -174,21 +178,37 @@ Phase 4 — 报告：
 
 如果需要重大架构变更，标记并继续。遇到阻塞时向我提问。`
 
+const tagMapping = {
+  '性能优化': ['performance', 'optimization', '性能'],
+  'UI实现': ['ui', 'design', '前端'],
+  '代码重构': ['refactor', 'clean-code', '重构'],
+  'Bug修复': ['debug', 'testing', '调试'],
+  '架构设计': ['architecture', 'design'],
+  '组件': ['component', 'design-system'],
+  '后端': ['api', 'backend', '后端']
+}
+
 const filteredTemplates = computed(() => {
   if (selectedTag.value === '全部') return templates
-  return templates.filter(t => t.category === selectedTag.value || t.tags.includes(selectedTag.value.toLowerCase()))
+  const mappedTags = tagMapping[selectedTag.value] || [selectedTag.value.toLowerCase()]
+  return templates.filter(t => 
+    t.category === selectedTag.value || 
+    t.tags.some(tag => mappedTags.includes(tag.toLowerCase()))
+  )
 })
 
 function useTemplate(template) {
-  alert(`使用模板: ${template.name}`)
+  navigator.clipboard.writeText(template.content || laboratoryTemplate)
+  toast.success(`已复制 "${template.name}" 到剪贴板`)
 }
 
 function copyTemplate(text) {
   navigator.clipboard.writeText(text)
-  alert('已复制到剪贴板')
+  toast.success('已复制到剪贴板')
 }
 
 function useInLab() {
-  alert('跳转到实验室并填充此模板')
+  navigator.clipboard.writeText(laboratoryTemplate)
+  toast.success('已复制到剪贴板，请在实验室中使用')
 }
 </script>

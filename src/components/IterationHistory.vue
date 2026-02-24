@@ -8,12 +8,16 @@
       </div>
       
       <div class="flex gap-2">
-        <button class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm border border-[#e3e2e0] rounded hover:bg-[#f7f6f3] text-[#6b6b6b] transition-colors">
+        <button 
+          @click="exportHistory"
+          class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm border border-[#e3e2e0] rounded hover:bg-[#f7f6f3] text-[#6b6b6b] transition-colors"
+        >
           导出
         </button>
         
         <button 
           v-if="history.length > 0"
+          @click="clearHistory"
           class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm bg-[#e03e3e]/10 text-[#e03e3e] border border-[#e03e3e]/30 rounded hover:bg-[#e03e3e]/20 transition-colors"
         >
           清空
@@ -147,10 +151,15 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useToast } from '../composables/useToast'
+import { useLocalStorage } from '../composables/useLocalStorage'
+
+const toast = useToast()
+const emit = defineEmits(['use-prompt'])
 
 const expanded = ref(null)
 
-const history = ref([
+const defaultHistory = [
   {
     id: 1,
     title: '优化 React 组件性能提示词',
@@ -195,7 +204,9 @@ const history = ref([
       { type: 'add', description: '添加向后兼容性检查' }
     ]
   }
-])
+]
+
+const history = useLocalStorage('prompt-lab-history', defaultHistory)
 
 const avgImprovement = computed(() => {
   if (history.value.length === 0) return 0
@@ -214,10 +225,29 @@ function toggleExpand(index) {
 
 function reusePrompt(prompt) {
   navigator.clipboard.writeText(prompt)
-  alert('已复制到剪贴板')
+  toast.success('已复制到剪贴板')
 }
 
 function compareVersions(item) {
-  alert(`对比 ${item.title} 的版本差异`)
+  toast.info('详细对比功能开发中')
+}
+
+function clearHistory() {
+  if (confirm('确定要清空所有历史记录吗？')) {
+    history.value = []
+    toast.success('历史记录已清空')
+  }
+}
+
+function exportHistory() {
+  const dataStr = JSON.stringify(history.value, null, 2)
+  const blob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `prompt-lab-history-${new Date().toISOString().split('T')[0]}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+  toast.success('历史记录已导出')
 }
 </script>

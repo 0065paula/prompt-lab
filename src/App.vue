@@ -20,7 +20,7 @@
             <button 
               v-for="tab in tabs" 
               :key="tab.id"
-              @click="currentTab = tab.id"
+              @click="router.push(tab.path)"
               :class="['px-3 py-1.5 rounded text-sm transition-colors', currentTab === tab.id ? 'bg-[#f1f1ef] text-[#37352f] font-medium' : 'text-[#6b6b6b] hover:bg-[#f7f6f3]']"
             >
               {{ tab.name }}
@@ -44,7 +44,7 @@
           <button 
             v-for="tab in tabs" 
             :key="tab.id"
-            @click="currentTab = tab.id; showMobileMenu = false"
+            @click="router.push(tab.path); showMobileMenu = false"
             :class="['w-full text-left px-3 py-2.5 rounded text-sm transition-colors', currentTab === tab.id ? 'bg-[#f1f1ef] text-[#37352f] font-medium' : 'text-[#6b6b6b]']"
           >
             {{ tab.name }}
@@ -55,6 +55,22 @@
 
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6 safe-bottom">
+      <!-- Toast Container -->
+      <div class="fixed top-16 sm:top-20 right-4 z-[100] space-y-2">
+        <div 
+          v-for="toast in toasts" 
+          :key="toast.id"
+          :class="[
+            'px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-slideIn max-w-xs',
+            toast.type === 'success' ? 'bg-[#0f7b6f] text-white' : '',
+            toast.type === 'error' ? 'bg-[#e03e3e] text-white' : '',
+            toast.type === 'warning' ? 'bg-[#dfab01] text-white' : '',
+            toast.type === 'info' ? 'bg-[#37352f] text-white' : ''
+          ]"
+        >
+          {{ toast.message }}
+        </div>
+      </div>
       <!-- Phase Progress - Mobile Optimized -->
       <div class="mb-6 sm:mb-8">
         <div class="flex items-center justify-between mb-3">
@@ -81,15 +97,7 @@
 
       <!-- Tab Content -->
       <div class="animate-fadeIn">
-        <PromptLaboratory 
-          v-if="currentTab === 'laboratory'"
-          :current-phase="currentPhase"
-          @phase-complete="onPhaseComplete"
-          @reset="resetLaboratory"
-        />
-        <VisualComparison v-else-if="currentTab === 'comparison'" />
-        <PromptTemplates v-else-if="currentTab === 'templates'" />
-        <IterationHistory v-else-if="currentTab === 'history'" />
+        <router-view />
       </div>
     </main>
   </div>
@@ -97,19 +105,21 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import PromptLaboratory from './components/PromptLaboratory.vue'
-import VisualComparison from './components/VisualComparison.vue'
-import PromptTemplates from './components/PromptTemplates.vue'
-import IterationHistory from './components/IterationHistory.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useToast } from './composables/useToast'
+
+const route = useRoute()
+const router = useRouter()
+const { toasts } = useToast()
 
 const tabs = [
-  { id: 'laboratory', name: '实验室' },
-  { id: 'comparison', name: '视觉对比' },
-  { id: 'templates', name: '提示词模板' },
-  { id: 'history', name: '迭代历史' },
+  { id: 'laboratory', name: '实验室', path: '/laboratory' },
+  { id: 'comparison', name: '视觉对比', path: '/comparison' },
+  { id: 'templates', name: '提示词模板', path: '/templates' },
+  { id: 'history', name: '迭代历史', path: '/history' },
 ]
 
-const currentTab = ref('laboratory')
+const currentTab = computed(() => route.name)
 const showMobileMenu = ref(false)
 
 const phases = [
@@ -186,5 +196,14 @@ function resetLaboratory() {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
 }
 </style>

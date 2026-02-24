@@ -1,5 +1,28 @@
 <template>
   <div class="space-y-4 sm:space-y-6">
+    <!-- Phase Progress -->
+    <div class="mb-6 sm:mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base sm:text-lg font-medium">{{ currentPhaseName }}</h2>
+        <span class="text-xs sm:text-sm text-[#6b6b6b]">{{ completedPhases }}/4 完成</span>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+        <div 
+          v-for="(phase, index) in phases" 
+          :key="phase.id"
+          :class="['p-3 sm:p-4 rounded border transition-all cursor-pointer', getPhaseClass(index)]"
+          @click="goToPhase(index)"
+        >
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-lg sm:text-xl">{{ phase.icon }}</span>
+            <span class="font-medium text-sm">{{ phase.name }}</span>
+          </div>
+          <p class="text-xs text-[#6b6b6b] leading-relaxed">{{ phase.description }}</p>
+        </div>
+      </div>
+    </div>
+    
     <!-- Mobile: Single Column / Desktop: Two Columns -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
       <!-- Left: Input & Control -->
@@ -55,7 +78,7 @@
           </button>
           
           <button 
-            @click="$emit('reset')"
+            @click="resetLaboratory"
             class="px-3 sm:px-4 py-2.5 sm:py-3 rounded border border-[#e3e2e0] text-[#6b6b6b] hover:bg-[#f7f6f3] active:bg-[#e3e2e0] text-sm sm:text-base"
           >
             重置
@@ -152,16 +175,77 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useToast } from '../composables/useToast'
+import { useLocalStorage } from '../composables/useLocalStorage'
 
-const props = defineProps(['currentPhase'])
-const emit = defineEmits(['phase-complete', 'reset'])
+const toast = useToast()
 
-const originalPrompt = ref('')
-const optimizedPrompt = ref('')
+const originalPrompt = useLocalStorage('prompt-lab-original', '')
+const optimizedPrompt = useLocalStorage('prompt-lab-optimized', '')
 const isOptimizing = ref(false)
 const phase1Completed = ref(false)
 const instrumentationResults = ref(null)
+
+const phases = [
+  { 
+    id: 'instrumentation', 
+    name: '仪表化', 
+    icon: '📊',
+    description: '建立测量基线'
+  },
+  { 
+    id: 'diagnosis', 
+    name: '诊断', 
+    icon: '🔍',
+    description: '分析瓶颈问题'
+  },
+  { 
+    id: 'iteration', 
+    name: '迭代', 
+    icon: '🔄',
+    description: '逐个修复验证'
+  },
+  { 
+    id: 'report', 
+    name: '报告', 
+    icon: '📈',
+    description: '生成对比报告'
+  },
+]
+
+const currentPhase = ref(0)
+const completedPhases = ref(0)
+
+const currentPhaseName = computed(() => {
+  if (completedPhases.value === 4) return '✅ 所有阶段已完成'
+  return `当前阶段: ${phases[currentPhase.value]?.name}`
+})
+
+function getPhaseClass(index) {
+  if (index < completedPhases.value) {
+    return 'bg-[#0f7b6f]/10 border-[#0f7b6f] text-[#0f7b6f]'
+  }
+  if (index === currentPhase.value) {
+    return 'bg-[#2383e2]/10 border-[#2383e2] text-[#2383e2]'
+  }
+  return 'bg-white border-[#e3e2e0] text-[#6b6b6b] hover:bg-[#f7f6f3]'
+}
+
+function goToPhase(index) {
+  if (index <= completedPhases.value || index === currentPhase.value) {
+    currentPhase.value = index
+  }
+}
+
+function onPhaseComplete() {
+  if (currentPhase.value < phases.length - 1) {
+    completedPhases.value = currentPhase.value + 1
+    currentPhase.value++
+  } else {
+    completedPhases.value = phases.length
+  }
+}
 
 const targets = [
   { id: 'clarity', name: '提升清晰度', icon: '✨', description: '让指令更明确，减少歧义' },
@@ -171,7 +255,7 @@ const targets = [
   { id: 'feedback', name: '反馈循环', icon: '🔄', description: '建立自我验证机制' },
 ]
 
-const selectedTargets = ref([])
+const selectedTargets = useLocalStorage('prompt-lab-targets', [])
 const changes = ref([])
 
 const canStart = computed(() => 
@@ -201,7 +285,7 @@ function runInstrumentation() {
   }
   
   phase1Completed.value = true
-  emit('phase-complete')
+  onPhaseComplete()
 }
 
 async function startOptimization() {
@@ -234,11 +318,22 @@ async function startOptimization() {
   changes.value = newChanges
   
   isOptimizing.value = false
-  emit('phase-complete')
+  onPhaseComplete()
 }
 
 function copyOptimized() {
   navigator.clipboard.writeText(optimizedPrompt.value)
+  toast.success('已复制到剪贴板')
+}
+
+function resetLaboratory() {
+  currentPhase.value = 0
+  completedPhases.value = 0
+  originalPrompt.value = ''
+  optimizedPrompt.value = ''
+  phase1Completed.value = false
+  instrumentationResults.value = null
+  changes.value = []
 }
 
 function sleep(ms) {
