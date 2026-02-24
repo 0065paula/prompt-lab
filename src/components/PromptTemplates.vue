@@ -7,7 +7,7 @@
         <h2 class="text-lg sm:text-xl font-medium text-[#37352f]">提示词模板库</h2>
       </div>
       
-      <button class="px-3 sm:px-4 py-2 bg-[#2383e2] hover:bg-[#1a6fc2] active:bg-[#155a9e] rounded text-sm font-medium text-white transition-colors w-fit">
+      <button type="button" class="px-3 sm:px-4 py-2 bg-[#2383e2] hover:bg-[#1a6fc2] active:bg-[#155a9e] rounded text-sm font-medium text-white transition-colors w-fit">
         + 添加模板
       </button>
     </div>
@@ -15,6 +15,7 @@
     <!-- Filter Tags -->
     <div class="flex gap-1.5 sm:gap-2 flex-wrap">
       <button 
+        type="button"
         v-for="tag in tags" 
         :key="tag"
         @click="selectedTag = tag"
@@ -76,6 +77,7 @@
 
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
         <button 
+          type="button"
           @click="copyTemplate(laboratoryTemplate)" 
           class="flex-1 py-2 sm:py-2.5 bg-[#2383e2] hover:bg-[#1a6fc2] active:bg-[#155a9e] rounded text-sm font-medium text-white transition-colors"
         >
@@ -83,6 +85,7 @@
         </button>
         
         <button 
+          type="button"
           @click="useInLab" 
           class="flex-1 py-2 sm:py-2.5 border border-[#2383e2] text-[#2383e2] hover:bg-[#2383e2]/10 active:bg-[#2383e2]/20 rounded text-sm font-medium transition-colors"
         >

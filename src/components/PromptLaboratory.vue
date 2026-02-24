@@ -70,6 +70,7 @@
         <!-- Action Buttons -->
         <div class="flex gap-2 sm:gap-3">
           <button 
+            type="button"
             @click="startOptimization"
             :disabled="!canStart"
             :class="['flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded font-medium transition-colors text-sm sm:text-base', canStart ? 'bg-[#2383e2] hover:bg-[#1a6fc2] text-white active:bg-[#155a9e]' : 'bg-[#e3e2e0] text-[#6b6b6b] cursor-not-allowed']"
@@ -78,6 +79,7 @@
           </button>
           
           <button 
+            type="button"
             @click="resetLaboratory"
             class="px-3 sm:px-4 py-2.5 sm:py-3 rounded border border-[#e3e2e0] text-[#6b6b6b] hover:bg-[#f7f6f3] active:bg-[#e3e2e0] text-sm sm:text-base"
           >
@@ -98,6 +100,7 @@
               基线分析
             </h3>
             <button 
+              type="button"
               v-if="!phase1Completed" 
               @click="runInstrumentation" 
               class="text-xs sm:text-sm text-[#2383e2] hover:text-[#1a6fc2] font-medium"
@@ -142,6 +145,7 @@
               优化后提示词
             </h3>
             <button 
+              type="button"
               @click="copyOptimized" 
               class="text-xs sm:text-sm text-[#2383e2] hover:text-[#1a6fc2] font-medium"
             >
@@ -175,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useToast } from '../composables/useToast'
 import { useLocalStorage } from '../composables/useLocalStorage'
 

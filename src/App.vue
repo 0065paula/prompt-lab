@@ -18,6 +18,7 @@
           <!-- Desktop Navigation -->
           <nav class="hidden md:flex gap-1">
             <button 
+              type="button"
               v-for="tab in tabs" 
               :key="tab.id"
               @click="router.push(tab.path)"
@@ -29,6 +30,7 @@
 
           <!-- Mobile Menu Button -->
           <button 
+            type="button"
             @click="showMobileMenu = !showMobileMenu"
             class="md:hidden p-2 rounded hover:bg-[#f1f1ef]"
           >
@@ -42,6 +44,7 @@
         <!-- Mobile Navigation -->
         <nav v-if="showMobileMenu" class="md:hidden mt-3 pt-3 border-t border-[#e3e2e0] space-y-1">
           <button 
+            type="button"
             v-for="tab in tabs" 
             :key="tab.id"
             @click="router.push(tab.path); showMobileMenu = false"

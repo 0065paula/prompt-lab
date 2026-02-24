@@ -93,6 +93,7 @@
     <div v-if="referenceImage && implementationImage" class="mt-4 sm:mt-6 space-y-4">
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
         <button 
+          type="button"
           @click="runComparison"
           :disabled="isComparing"
           :class="['flex-1 py-2.5 sm:py-3 px-4 rounded font-medium transition-colors text-sm sm:text-base', isComparing ? 'bg-[#e3e2e0] text-[#6b6b6b]' : 'bg-[#2383e2] hover:bg-[#1a6fc2] text-white active:bg-[#155a9e]']"
@@ -101,6 +102,7 @@
         </button>
         
         <button 
+          type="button"
           @click="toggleOverlay"
           :class="['py-2.5 sm:py-3 px-4 rounded border font-medium transition-colors text-sm sm:text-base', showOverlay ? 'bg-[#2383e2]/10 border-[#2383e2] text-[#2383e2]' : 'border-[#e3e2e0] text-[#6b6b6b] hover:bg-[#f7f6f3]']"
         >
@@ -158,6 +160,12 @@ const showOverlay = ref(false)
 const overlayOpacity = ref(50)
 const comparisonResults = ref(null)
 
+function revokeObjectURL(url) {
+  if (url) {
+    URL.revokeObjectURL(url)
+  }
+}
+
 function uploadReference() {
   const input = document.createElement('input')
   input.type = 'file'
@@ -165,6 +173,7 @@ function uploadReference() {
   input.onchange = (e) => {
     const file = e.target.files[0]
     if (file) {
+      revokeObjectURL(referenceImage.value)
       referenceImage.value = URL.createObjectURL(file)
     }
   }
@@ -178,6 +187,7 @@ function uploadImplementation() {
   input.onchange = (e) => {
     const file = e.target.files[0]
     if (file) {
+      revokeObjectURL(implementationImage.value)
       implementationImage.value = URL.createObjectURL(file)
     }
   }

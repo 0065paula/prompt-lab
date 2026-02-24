@@ -9,6 +9,7 @@
       
       <div class="flex gap-2">
         <button 
+          type="button"
           @click="exportHistory"
           class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm border border-[#e3e2e0] rounded hover:bg-[#f7f6f3] text-[#6b6b6b] transition-colors"
         >
@@ -16,6 +17,7 @@
         </button>
         
         <button 
+          type="button"
           v-if="history.length > 0"
           @click="clearHistory"
           class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm bg-[#e03e3e]/10 text-[#e03e3e] border border-[#e03e3e]/30 rounded hover:bg-[#e03e3e]/20 transition-colors"
@@ -73,6 +75,7 @@
             </span>
             
             <button 
+              type="button"
               @click="toggleExpand(index)" 
               class="text-xs sm:text-sm text-[#2383e2] hover:text-[#1a6fc2] font-medium px-2 py-1 rounded hover:bg-[#f7f6f3]"
             >
@@ -119,6 +122,7 @@
           <!-- Actions -->
           <div class="flex gap-2">
             <button 
+              type="button"
               @click="reusePrompt(item.after)" 
               class="px-3 py-1.5 text-xs sm:text-sm bg-[#2383e2] hover:bg-[#1a6fc2] text-white rounded transition-colors"
             >
@@ -126,6 +130,7 @@
             </button>
             
             <button 
+              type="button"
               @click="compareVersions(item)" 
               class="px-3 py-1.5 text-xs sm:text-sm border border-[#e3e2e0] text-[#6b6b6b] rounded hover:bg-[#f7f6f3] transition-colors"
             >
@@ -142,7 +147,7 @@
       <h3 class="text-base sm:text-lg font-medium mb-2 text-[#37352f]">还没有实验记录</h3>
       <p class="text-sm text-[#6b6b6b] mb-4">去实验室开始你的第一次提示词优化吧</p>
       
-      <button class="px-4 py-2 bg-[#2383e2] hover:bg-[#1a6fc2] text-white rounded text-sm font-medium transition-colors">
+      <button type="button" class="px-4 py-2 bg-[#2383e2] hover:bg-[#1a6fc2] text-white rounded text-sm font-medium transition-colors">
         开始实验
       </button>
     </div>
