@@ -93,10 +93,11 @@ const router = useRouter()
 const { toasts } = useToast()
 
 const tabs = [
-  { id: 'laboratory', name: '实验室', path: '/laboratory' },
-  { id: 'comparison', name: '视觉对比', path: '/comparison' },
-  { id: 'templates', name: '提示词模板', path: '/templates' },
-  { id: 'history', name: '迭代历史', path: '/history' },
+  { id: 'diagnosis', name: '🩺 诊断', path: '/diagnosis' },
+  { id: 'optimizer', name: '✨ 优化', path: '/optimizer' },
+  { id: 'ab-test', name: '🧪 测试', path: '/ab-test' },
+  { id: 'history', name: '📚 历史', path: '/history' },
+  { id: 'templates', name: '🎨 模板', path: '/templates' },
 ]
 
 const currentTab = computed(() => route.name)
